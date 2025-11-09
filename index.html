@@ -2,60 +2,87 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>カード選択デモ（クリック＋長押し画像表示）</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>カード選択デモ（スマホ全画面固定）</title>
 <style>
-  body { background:#0f1724; color:#fff; font-family:"Noto Sans JP",sans-serif; margin:0; padding:16px; }
-  h2 { font-size:1.4rem; text-align:center; }
-  .char-select { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-bottom:10px; }
+  html, body {
+    margin:0; padding:0;
+    width:100%; height:100%;
+    overflow:hidden; /* スクロール禁止 */
+    background:#0f1724; color:#fff;
+    font-family:"Noto Sans JP",sans-serif;
+  }
+  body {
+    display:flex; flex-direction:column;
+    justify-content:space-between;
+    align-items:center;
+    height:100vh; box-sizing:border-box;
+  }
+  h2 { font-size:1.1rem; margin:4px 0; }
+  .char-select {
+    display:flex; justify-content:center; flex-wrap:wrap;
+    gap:4px; width:100%; padding:4px;
+  }
   .char-select button {
-    flex:1 1 45%; min-width:120px;
+    flex:1 1 22%; min-width:70px;
     background:#334155; color:#fff; border:none;
-    border-radius:8px; padding:10px; font-size:1rem;
-    cursor:pointer; transition:background .2s;
+    border-radius:6px; padding:6px;
+    font-size:0.75rem; cursor:pointer;
   }
-  .char-select button:active { transform:scale(0.97); }
-  .main { display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+  .main {
+    flex:1;
+    display:flex; justify-content:space-around; align-items:center;
+    width:100%;
+    padding:0 4px;
+  }
   .col {
-    flex:1 1 48%; background:#1e293b; border-radius:12px;
-    padding:10px; text-align:center;
+    flex:1; display:flex; flex-direction:column;
+    align-items:center; justify-content:space-between;
+    background:#1e293b; border-radius:10px;
+    margin:4px; padding:4px;
+    height:88%;
   }
-  .cards { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
+  .cards {
+    display:flex; flex-wrap:wrap; justify-content:center; gap:4px;
+    width:100%;
+  }
   .card {
-    width:110px; height:150px; background:#fff; color:#000;
-    border-radius:10px; padding:8px; cursor:pointer;
+    width:11vw; height:13vw;
+    background:#fff; color:#000;
+    border-radius:8px;
     display:flex; align-items:center; justify-content:center;
-    font-size:0.9rem; line-height:1.2; text-align:center;
-    transition:transform .1s, box-shadow .1s;
+    font-size:0.7rem; text-align:center;
+    cursor:pointer; transition:background .1s;
   }
-  .card:hover { transform:translateY(-3px); box-shadow:0 0 10px #333; }
   .card.selected { background:#c7b2ff; }
-  .trumps { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:10px; }
+  .trumps {
+    display:grid; grid-template-columns:repeat(2,1fr);
+    gap:4px; width:100%;
+  }
   .trump-card {
-    background:#ffe9e9; color:#000; padding:8px;
-    border-radius:8px; font-size:0.85rem; cursor:pointer;
+    background:#ffe9e9; color:#000;
+    font-size:0.65rem; border-radius:6px;
+    padding:3px; cursor:pointer;
+    text-align:center;
   }
   .overlay {
-    position:fixed; inset:0; background:rgba(0,0,0,0.8);
+    position:fixed; inset:0; background:rgba(0,0,0,0.85);
     display:none; align-items:center; justify-content:center;
     z-index:9999;
   }
   .overlay img {
-    max-width:90vw; max-height:90vh;
-    border-radius:10px; box-shadow:0 0 20px rgba(255,255,255,0.3);
+    max-width:85vw; max-height:85vh;
+    border-radius:10px;
   }
-  @media (max-width:768px){
-    .main { flex-direction:column; align-items:center; }
-    .col { width:95%; }
-    .card { width:42vw; height:140px; }
+
+  /* iPhoneの上下バー領域考慮 */
+  @supports (padding: env(safe-area-inset-bottom)) {
+    body { padding-bottom: env(safe-area-inset-bottom); }
   }
 </style>
 </head>
 <body>
-  <h2>カード選択デモ（クリック選択＋長押し画像表示）</h2>
-  <p style="text-align:center;font-size:14px;color:#aaa;">
-    参考: <a href="https://gptonline.ai/" target="_blank" style="color:#8cf;">gptonline.ai</a>
-  </p>
+  <h2>カード選択デモ（スマホ全画面固定）</h2>
 
   <div class="char-select">
     <button data-char="ユリナ">ユリナ</button>
@@ -66,24 +93,23 @@
 
   <div class="main">
     <div class="col">
-      <h3 id="char-left-title">左キャラ</h3>
+      <div id="char-left-title">左キャラ</div>
       <div class="cards" id="normal-left"></div>
       <div class="trumps" id="trumps-left"></div>
     </div>
     <div class="col">
-      <h3 id="char-right-title">右キャラ</h3>
+      <div id="char-right-title">右キャラ</div>
       <div class="cards" id="normal-right"></div>
       <div class="trumps" id="trumps-right"></div>
     </div>
   </div>
 
   <div class="overlay" id="overlay">
-    <img id="overlay-img" src="" alt="カード効果画像">
+    <img id="overlay-img" src="" alt="カード効果">
   </div>
 
   <script>
-  // --- キャラデータ ---
-  const CHAR_DATA = {
+  const CHAR_DATA={
     "ユリナ": {
       normal: [
         { name:"斬", effectImg:"images/yurina/na_01_yurina_o_n_1.png" },
@@ -155,107 +181,78 @@
       }
     };
 
-  const overlay = document.getElementById("overlay");
-  const overlayImg = document.getElementById("overlay-img");
-  const btns = document.querySelectorAll("button[data-char]");
-  const normalLeft = document.getElementById("normal-left");
-  const normalRight = document.getElementById("normal-right");
-  const trumpLeft = document.getElementById("trumps-left");
-  const trumpRight = document.getElementById("trumps-right");
-  const leftTitle = document.getElementById("char-left-title");
-  const rightTitle = document.getElementById("char-right-title");
+  const overlay=document.getElementById("overlay");
+  const overlayImg=document.getElementById("overlay-img");
+  const btns=document.querySelectorAll("button[data-char]");
+  const normalLeft=document.getElementById("normal-left");
+  const normalRight=document.getElementById("normal-right");
+  const trumpLeft=document.getElementById("trumps-left");
+  const trumpRight=document.getElementById("trumps-right");
+  const leftTitle=document.getElementById("char-left-title");
+  const rightTitle=document.getElementById("char-right-title");
 
-  let selectedChars = [];
-  let selectedNormals = [];
+  let selectedChars=[]; let selectedNormals=[];
 
-  btns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const name = btn.dataset.char;
-      const idx = selectedChars.indexOf(name);
-      if (idx !== -1) {
-        selectedChars.splice(idx, 1);
-        btn.style.background = "#334155";
-      } else {
-        if (selectedChars.length < 2) {
-          selectedChars.push(name);
-          btn.style.background = "#64748b";
-        } else {
-          const removed = selectedChars.shift();
-          document.querySelector(`button[data-char='${removed}']`).style.background = "#334155";
-          selectedChars.push(name);
-          btn.style.background = "#64748b";
+  btns.forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const name=btn.dataset.char;
+      const idx=selectedChars.indexOf(name);
+      if(idx!==-1){ selectedChars.splice(idx,1); btn.style.background="#334155";}
+      else{
+        if(selectedChars.length<2){selectedChars.push(name); btn.style.background="#64748b";}
+        else{
+          const removed=selectedChars.shift();
+          document.querySelector(`button[data-char='${removed}']`).style.background="#334155";
+          selectedChars.push(name); btn.style.background="#64748b";
         }
       }
       render();
     });
   });
 
-  function makeCard(card, isTrump = false) {
-    const el = document.createElement("div");
-    el.className = isTrump ? "trump-card" : "card";
-    el.textContent = card.name;
+  function makeCard(card,isTrump=false){
+    const el=document.createElement("div");
+    el.className=isTrump?"trump-card":"card";
+    el.textContent=card.name;
 
-    // 通常札クリックで選択／解除
-    el.addEventListener("click", (e) => {
-      if (!isTrump) {
-        if (el.classList.contains("selected")) {
+    // 通常札クリックで選択
+    el.addEventListener("click",()=>{
+      if(!isTrump){
+        if(el.classList.contains("selected")){
           el.classList.remove("selected");
-          selectedNormals = selectedNormals.filter(x => x !== el);
-        } else {
-          if (selectedNormals.length < 7) {
+          selectedNormals=selectedNormals.filter(x=>x!==el);
+        }else{
+          if(selectedNormals.length<7){
             el.classList.add("selected");
             selectedNormals.push(el);
-          } else {
-            alert("通常札は7枚まで選択できます。");
-          }
+          }else alert("通常札は7枚まで選択できます。");
         }
-      } else {
-        if (card.effectImg) showImage(card.effectImg);
+      }else{
+        if(card.effectImg) showImage(card.effectImg);
       }
     });
 
-    // 長押し検出（スマホ対応）
-    let touchTimer;
-    el.addEventListener("touchstart", () => {
-      touchTimer = setTimeout(() => {
-        if (card.effectImg) showImage(card.effectImg);
-      }, 600); // 0.6秒長押しで発動
-    });
-    el.addEventListener("touchend", () => clearTimeout(touchTimer));
-    el.addEventListener("touchmove", () => clearTimeout(touchTimer));
+    // 長押しで効果画像表示
+    let timer;
+    el.addEventListener("touchstart",()=>{ timer=setTimeout(()=>{ if(card.effectImg) showImage(card.effectImg); },600); });
+    el.addEventListener("touchend",()=>clearTimeout(timer));
+    el.addEventListener("touchmove",()=>clearTimeout(timer));
 
-    // 右クリック（PC用）
-    el.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-      if (card.effectImg) showImage(card.effectImg);
-    });
-
+    el.addEventListener("contextmenu",(e)=>{ e.preventDefault(); if(card.effectImg) showImage(card.effectImg); });
     return el;
   }
 
-  function showImage(src) {
-    overlayImg.src = src;
-    overlay.style.display = "flex";
+  function showImage(src){ overlayImg.src=src; overlay.style.display="flex"; }
+  overlay.addEventListener("click",()=>overlay.style.display="none");
+
+  function render(){
+    normalLeft.innerHTML=normalRight.innerHTML=trumpLeft.innerHTML=trumpRight.innerHTML="";
+    const left=selectedChars[0]; const right=selectedChars[1];
+    leftTitle.textContent=left||"左キャラ";
+    rightTitle.textContent=right||"右キャラ";
+    if(left){ CHAR_DATA[left].normal.forEach(c=>normalLeft.appendChild(makeCard(c,false))); CHAR_DATA[left].trumps.forEach(c=>trumpLeft.appendChild(makeCard(c,true))); }
+    if(right){ CHAR_DATA[right].normal.forEach(c=>normalRight.appendChild(makeCard(c,false))); CHAR_DATA[right].trumps.forEach(c=>trumpRight.appendChild(makeCard(c,true))); }
   }
-
-  overlay.addEventListener("click", () => overlay.style.display = "none");
-
-  function render() {
-    normalLeft.innerHTML = normalRight.innerHTML = trumpLeft.innerHTML = trumpRight.innerHTML = "";
-    const left = selectedChars[0];
-    const right = selectedChars[1];
-    leftTitle.textContent = left || "左キャラ";
-    rightTitle.textContent = right || "右キャラ";
-    if (left) {
-      CHAR_DATA[left].normal.forEach(c => normalLeft.appendChild(makeCard(c, false)));
-      CHAR_DATA[left].trumps.forEach(c => trumpLeft.appendChild(makeCard(c, true)));
-    }
-    if (right) {
-      CHAR_DATA[right].normal.forEach(c => normalRight.appendChild(makeCard(c, false)));
-      CHAR_DATA[right].trumps.forEach(c => trumpRight.appendChild(makeCard(c, true)));
-    }
-  }
-
   render();
   </script>
 </body>
