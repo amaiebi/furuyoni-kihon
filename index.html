@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>カード選択デモ（スマホ最適＋上寄せ）</title>
+<title>ふるよにコモンズ/BakaFire,TOKIAME</title>
 <style>
   html, body {
     margin:0; padding:0;
@@ -302,7 +302,7 @@
 
     // スマホ長押し対応
     let timer;
-    el.addEventListener("touchstart",()=>{ timer=setTimeout(()=>{ if(card.effectImg) showImage(card.effectImg); },600); });
+    el.addEventListener("touchstart",()=>{ timer=setTimeout(()=>{ if(card.effectImg) showImage(card.effectImg); },300); });
     el.addEventListener("touchend",()=>clearTimeout(timer));
     el.addEventListener("touchmove",()=>clearTimeout(timer));
 
