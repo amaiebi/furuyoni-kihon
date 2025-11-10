@@ -162,12 +162,12 @@
 
   <div class="main">
     <div class="col">
-      <div id="char-left-title">左キャラ</div>
+      <div id="char-left-title">メガミA</div>
       <div class="cards" id="normal-left"></div>
       <div class="trumps" id="trumps-left"></div>
     </div>
     <div class="col">
-      <div id="char-right-title">右キャラ</div>
+      <div id="char-right-title">メガミB</div>
       <div class="cards" id="normal-right"></div>
       <div class="trumps" id="trumps-right"></div>
     </div>
@@ -302,7 +302,7 @@
 
     // スマホ長押し対応
     let timer;
-    el.addEventListener("touchstart",()=>{ timer=setTimeout(()=>{ if(card.effectImg) showImage(card.effectImg); },300); });
+    el.addEventListener("touchstart",()=>{ timer=setTimeout(()=>{ if(card.effectImg) showImage(card.effectImg); },150); });
     el.addEventListener("touchend",()=>clearTimeout(timer));
     el.addEventListener("touchmove",()=>clearTimeout(timer));
 
@@ -316,8 +316,8 @@
   function render(){
     normalLeft.innerHTML=normalRight.innerHTML=trumpLeft.innerHTML=trumpRight.innerHTML="";
     const left=selectedChars[0]; const right=selectedChars[1];
-    leftTitle.textContent=left||"左キャラ";
-    rightTitle.textContent=right||"右キャラ";
+    leftTitle.textContent=left||"メガミA";
+    rightTitle.textContent=right||"メガミB";
     if(left){ CHAR_DATA[left].normal.forEach(c=>normalLeft.appendChild(makeCard(c,false))); CHAR_DATA[left].trumps.forEach(c=>trumpLeft.appendChild(makeCard(c,true))); }
     if(right){ CHAR_DATA[right].normal.forEach(c=>normalRight.appendChild(makeCard(c,false))); CHAR_DATA[right].trumps.forEach(c=>trumpRight.appendChild(makeCard(c,true))); }
   }
