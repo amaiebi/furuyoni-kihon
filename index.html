@@ -266,11 +266,7 @@
 
     // 長押しで効果画像
     let timer;
-    el.addEventListener("touchstart",(e)=>{
-  e.preventDefault(); // ← Androidブラウザの長押しメニュー防止！
-  timer=setTimeout(()=>{ if(card.effectImg) showImage(card.effectImg); },150);
-});
-
+    el.addEventListener("touchstart",()=>{ timer=setTimeout(()=>{ if(card.effectImg) showImage(card.effectImg); },150); });
     el.addEventListener("touchend",()=>clearTimeout(timer));
     el.addEventListener("touchmove",()=>clearTimeout(timer));
 
@@ -291,6 +287,7 @@
     if(right){ CHAR_DATA[right].normal.forEach(c=>normalRight.appendChild(makeCard(c,false))); CHAR_DATA[right].trumps.forEach(c=>trumpRight.appendChild(makeCard(c,true))); }
   }
   render();
+    document.addEventListener("contextmenu", e => e.preventDefault());
   </script>
 </body>
 </html>
