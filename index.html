@@ -36,9 +36,9 @@
 </style>
 </head>
 <body>
-  <!-- キャラ選択モーダル -->
+  <!-- メガミ選択モーダル -->
   <div class="modal" id="modal">
-    <h2>キャラを2人選択してください</h2>
+    <h2>メガミを選択してください</h2>
     <div class="char-list" id="char-list">
       <button class="char-item" data-char="ユリナ">ユリナ</button>
       <button class="char-item" data-char="ヒミカ">ヒミカ</button>
@@ -51,25 +51,23 @@
   <!-- カード表示 -->
   <div class="main" id="main" style="display:none;">
     <div class="col">
-      <div id="char-left-title">左キャラ</div>
+      <div id="char-left-title">メガミA</div>
       <div class="cards" id="normal-left"></div>
       <div style="width:100%;margin-top:8px">
-        <div class="title" style="font-size:0.85rem;margin-bottom:6px">切札</div>
         <div class="trumps" id="trumps-left"></div>
       </div>
     </div>
     <div class="col">
-      <div id="char-right-title">右キャラ</div>
+      <div id="char-right-title">メガミB</div>
       <div class="cards" id="normal-right"></div>
       <div style="width:100%;margin-top:8px">
-        <div class="title" style="font-size:0.85rem;margin-bottom:6px">切札</div>
         <div class="trumps" id="trumps-right"></div>
       </div>
     </div>
   </div>
 
   <!-- 再選択ボタン（下部固定） -->
-  <button class="reselect-bottom" id="reselect">キャラ再選択</button>
+  <button class="reselect-bottom" id="reselect">メガミ再選択</button>
 
   <!-- 効果画像表示 -->
   <div class="overlay" id="overlay"><img id="overlay-img" src="" alt=""></div>
@@ -168,19 +166,19 @@ const rightTitle=document.getElementById("char-right-title");
 /* ---------- 状態 ---------- */
 let selectedChars=[];
 
-/* ---------- キャラ選択 ---------- */
+/* ---------- メガミ選択 ---------- */
 list.querySelectorAll(".char-item").forEach(btn=>{
   btn.addEventListener("click",()=>{
     const name=btn.dataset.char;
     const idx=selectedChars.indexOf(name);
     if(idx!==-1){ selectedChars.splice(idx,1); btn.classList.remove("selected"); }
     else if(selectedChars.length<2){ selectedChars.push(name); btn.classList.add("selected"); }
-    else{ alert("2キャラまで選択できます"); }
+    else{ alert("2体まで選択できます"); }
   });
 });
 
 confirm.addEventListener("click",()=>{
-  if(selectedChars.length!==2){ alert("2キャラ選んでください"); return; }
+  if(selectedChars.length!==2){ alert("2体選んでください"); return; }
   modal.style.display="none"; main.style.display="flex";
   renderCards();
 });
