@@ -3,291 +3,247 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>ふるよにコモンズ/BakaFire,TOKIAME</title>
+<title>ポップアップ型（合計上限版）</title>
 <style>
-  html, body {
-    margin:0; padding:0;
-    width:100%; height:100%;
-    overflow:hidden;
-    background:#0f1724; color:#fff;
-    font-family:"Noto Sans JP",sans-serif;
-  }
-
-  body {
-    display:flex; flex-direction:column;
-    justify-content:flex-start;
-    align-items:center;
-    height:100vh;
-    padding-top:2vh;
-  }
-
-  h2 {
-    font-size:1.2rem;
-    margin:2px 0 6px;
-  }
-
-  .char-select {
-    display:flex; justify-content:center; flex-wrap:wrap;
-    gap:6px; width:100%; padding:4px 8px;
-  }
-  .char-select button {
-    flex:1 1 22%; min-width:80px;
-    background:#334155; color:#fff; border:none;
-    border-radius:8px; padding:10px 0;
-    font-size:0.9rem; font-weight:600; cursor:pointer;
-    transition:background 0.2s;
-  }
-  .char-select button:hover { background:#475569; }
-
-  .main {
-    flex:1; display:flex;
-    justify-content:space-around; align-items:flex-start;
-    width:100%; padding:0 4px;
-  }
-
-  .col {
-    flex:1; display:flex; flex-direction:column;
-    align-items:center; justify-content:flex-start;
-    background:#1e293b; border-radius:10px;
-    margin:4px; padding:4px;
-    height:86%;
-  }
-
-  #char-left-title, #char-right-title {
-    font-size:0.9rem; margin-bottom:2px; font-weight:600;
-  }
-
-  .cards {
-    display:flex; flex-wrap:wrap; justify-content:center; gap:4px;
-    width:100%; margin-bottom:3px;
-  }
-
-  .card {
-    width:12vw; height:14vw;
-    background:#fff; color:#000; border-radius:8px;
-    display:flex; align-items:center; justify-content:center;
-    font-size:0.8rem; text-align:center;
-    cursor:pointer; transition:background .1s;
-  }
-
-  .card.selected { background:#c7b2ff; }
-
-  .trumps {
-    display:grid; grid-template-columns:repeat(2,1fr);
-    gap:4px; width:100%;
-  }
-
-  .trump-card {
-    background:#ffe9e9; color:#000; font-size:0.75rem;
-    border-radius:6px; padding:4px;
-    cursor:pointer; text-align:center;
-    transition:background .1s;
-  }
-
-  .trump-card.selected { background:#ffb6b6; }
-
-  .overlay {
-    position:fixed; inset:0;
-    background:rgba(0,0,0,0.85);
-    display:none; align-items:center; justify-content:center;
-    z-index:9999;
-  }
-  .overlay img {
-    max-width:85vw; max-height:85vh; border-radius:10px;
-  }
-
-  @supports (padding: env(safe-area-inset-bottom)) {
-    body { padding-bottom: env(safe-area-inset-bottom); }
-  }
+  html,body{margin:0;padding:0;width:100%;height:100%;background:#0f1724;color:#fff;font-family:"Noto Sans JP",sans-serif;overflow:hidden;}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;}
+  .modal h2{margin-bottom:10px;font-size:1.2rem;}
+  .char-list{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;width:90%;max-width:400px;}
+  .char-item{flex:1 1 40%;background:#334155;color:#fff;border:none;border-radius:10px;padding:14px 0;text-align:center;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s;}
+  .char-item.selected{background:#64748b;}
+  .confirm-btn{margin-top:20px;background:#38bdf8;border:none;border-radius:8px;padding:10px 20px;color:#000;font-weight:600;font-size:1rem;cursor:pointer;}
+  .main{display:flex;justify-content:space-around;align-items:flex-start;width:100%;height:100vh;padding:4px;}
+  .col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:#1e293b;border-radius:10px;margin:4px;padding:4px;}
+  .cards{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;width:100%;}
+  .card{width:12vw;height:14vw;min-width:80px;background:#fff;color:#000;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;text-align:center;cursor:pointer;transition:background .1s;user-select:none}
+  .card.selected{background:#c7b2ff;}
+  .trumps{display:grid;grid-template-columns:repeat(2,1fr);gap:4px;width:100%;}
+  .trump-card{background:#ffe9e9;color:#000;border-radius:6px;font-size:0.75rem;padding:4px;cursor:pointer;text-align:center;transition:background .1s;user-select:none}
+  .trump-card.selected{background:#ffb6b6;}
+  .header{position:absolute;top:4px;right:4px;background:#475569;border:none;border-radius:8px;padding:6px 10px;color:#fff;font-size:0.8rem;cursor:pointer;}
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:9999}
+  .overlay img{max-width:85vw;max-height:85vh;border-radius:10px;}
 </style>
 </head>
 <body>
-  <h2>ふるよにコモンズ/BakaFire,TOKIAME</h2>
-
-  <div class="char-select">
-    <button data-char="ユリナ">ユリナ</button>
-    <button data-char="ヒミカ">ヒミカ</button>
-    <button data-char="サイネ">サイネ</button>
-    <button data-char="トコヨ">トコヨ</button>
+  <div class="modal" id="modal">
+    <h2>キャラを2人選択してください</h2>
+    <div class="char-list" id="char-list">
+      <button class="char-item" data-char="ユリナ">ユリナ</button>
+      <button class="char-item" data-char="ヒミカ">ヒミカ</button>
+      <button class="char-item" data-char="サイネ">サイネ</button>
+      <button class="char-item" data-char="トコヨ">トコヨ</button>
+    </div>
+    <button class="confirm-btn" id="confirm">確定</button>
   </div>
 
-  <div class="main">
+  <div class="main" id="main" style="display:none;">
+    <button class="header" id="reselect">キャラ再選択</button>
     <div class="col">
-      <div id="char-left-title">メガミA</div>
+      <div id="char-left-title">左キャラ</div>
       <div class="cards" id="normal-left"></div>
-      <div class="trumps" id="trumps-left"></div>
+      <div style="width:100%;margin-top:8px"><div class="title" style="font-size:0.85rem;margin-bottom:6px">切札</div>
+        <div class="trumps" id="trumps-left"></div>
+      </div>
     </div>
     <div class="col">
-      <div id="char-right-title">メガミB</div>
+      <div id="char-right-title">右キャラ</div>
       <div class="cards" id="normal-right"></div>
-      <div class="trumps" id="trumps-right"></div>
+      <div style="width:100%;margin-top:8px"><div class="title" style="font-size:0.85rem;margin-bottom:6px">切札</div>
+        <div class="trumps" id="trumps-right"></div>
+      </div>
     </div>
   </div>
 
-  <div class="overlay" id="overlay">
-    <img id="overlay-img" src="" alt="カード効果">
-  </div>
+  <div class="overlay" id="overlay"><img id="overlay-img" src="" alt=""></div>
 
-  <script>
-  const CHAR_DATA={
-    "ユリナ": {
-      normal: [
-        { name:"斬", effectImg:"images/yurina/na_01_yurina_o_n_1.png" },
-        { name:"一閃", effectImg:"images/yurina/na_01_yurina_o_n_2.png" },
-        { name:"柄打ち", effectImg:"images/yurina/na_01_yurina_o_n_3.png" },
-        { name:"居合", effectImg:"images/yurina/na_01_yurina_o_n_4_s2.png" },
-        { name:"体捌き", effectImg:"images/yurina/na_01_yurina_o_n_5_s9_5.png" },
-        { name:"圧気", effectImg:"images/yurina/na_01_yurina_o_n_6.png" },
-        { name:"気炎万丈", effectImg:"images/yurina/na_01_yurina_o_n_7.png" }
-      ],
-      trumps: [
-        { name:"月影落", effectImg:"images/yurina/na_01_yurina_o_s_1.png" },
-        { name:"浦波嵐", effectImg:"images/yurina/na_01_yurina_o_s_2_s5.png" },
-        { name:"浮舟宿", effectImg:"images/yurina/na_01_yurina_o_s_3_s2.png" },
-        { name:"天音揺波の底力", effectImg:"images/yurina/na_01_yurina_o_s_4.png" }
-      ]
-    },
-    "ヒミカ": {
-      normal: [
-        { name:"シュート", effectImg:"images/himika/na_03_himika_o_n_1.png" },
-        { name:"ラピッドファイア", effectImg:"images/himika/na_03_himika_o_n_2_s4.png" },
-        { name:"マグナムカノン", effectImg:"images/himika/na_03_himika_o_n_3.png" },
-        { name:"フルバースト", effectImg:"images/himika/na_03_himika_o_n_4.png" },
-        { name:"バックステップ", effectImg:"images/himika/na_03_himika_o_n_5.png" },
-        { name:"バックドラフト", effectImg:"images/himika/na_03_himika_o_n_6_s5.png" },
-        { name:"スモーク", effectImg:"images/himika/na_03_himika_o_n_7.png" }
-      ],
-      trumps: [
-        { name:"レッドバレット", effectImg:"images/himika/na_03_himika_o_s_1.png" },
-        { name:"クリムゾンゼロ", effectImg:"images/himika/na_03_himika_o_s_2.png" },
-        { name:"スカーレットイマジン", effectImg:"images/himika/na_03_himika_o_s_3.png" },
-        { name:"ヴァーミリオンフィールド", effectImg:"images/himika/na_03_himika_o_s_4.png" }
-      ]
-    },
-    // 他キャラも同様に追加可能
-            "サイネ": {
-        normal:[
-          {name:"八方振り",effectImg:"images/saine/na_02_saine_o_n_1_s6_2.png"},
-          {name:"薙斬り",effectImg:"images/saine/na_02_saine_o_n_2.png"},
-          {name:"石突",effectImg:"images/saine/na_02_saine_o_n_3_s6_2.png"},
-          {name:"見切り",effectImg:"images/saine/na_02_saine_o_n_4_s6_2.png"},
-          {name:"圏域",effectImg:"images/saine/na_02_saine_o_n_5_s5.png"},
-          {name:"衝音晶",effectImg:"images/saine/na_02_saine_o_n_6_s3.png"},
-          {name:"無音壁",effectImg:"images/saine/na_02_saine_o_n_7.png"}
-        ],
-        trumps:[
-          {name:"律動弧戟",effectImg:"images/saine/na_02_saine_o_s_1_s2.png"},
-          {name:"響鳴共振",effectImg:"images/saine/na_02_saine_o_s_2_s2.png"},
-          {name:"音無砕氷",effectImg:"images/saine/na_02_saine_o_s_3_s6_2.png"},
-          {name:"氷雨細音の果ての果て",effectImg:"images/saine/na_02_saine_o_s_4_s2.png"}
-        ]
-      },
-      "トコヨ": {
-        normal:[
-          {name:"梳流し",effectImg:"images/tokoyo/na_04_tokoyo_o_n_1_s2.png"},
-          {name:"雅打ち",effectImg:"images/tokoyo/na_04_tokoyo_o_n_2.png"},
-          {name:"跳ね兎",effectImg:"images/tokoyo/na_04_tokoyo_o_n_3.png"},
-          {name:"詩舞",effectImg:"images/tokoyo/na_04_tokoyo_o_n_4.png"},
-          {name:"要返し",effectImg:"images/tokoyo/na_04_tokoyo_o_n_5.png"},
-          {name:"風舞台",effectImg:"images/tokoyo/na_04_tokoyo_o_n_6.png"},
-          {name:"晴舞台",effectImg:"images/tokoyo/na_04_tokoyo_o_n_7_s6_2.png"}
-        ],
-        trumps:[
-          {name:"久遠の花",effectImg:"images/tokoyo/na_04_tokoyo_o_s_1.png"},
-          {name:"千歳ノ鳥",effectImg:"images/tokoyo/na_04_tokoyo_o_s_2.png"},
-          {name:"無窮ノ風",effectImg:"images/tokoyo/na_04_tokoyo_o_s_3_s2.png"},
-          {name:"常世ノ月",effectImg:"images/tokoyo/na_04_tokoyo_o_s_4.png"}
-        ]
+<script>
+/* ---------- キャラ・カードデータ ---------- */
+const CHAR_DATA = {
+  "ユリナ": {
+    normal: [
+      { name:"斬", effectImg:"images/yurina/na_01_yurina_o_n_1.png" },
+      { name:"一閃", effectImg:"images/yurina/na_01_yurina_o_n_2.png" },
+      { name:"柄打ち", effectImg:"images/yurina/na_01_yurina_o_n_3.png" },
+      { name:"居合", effectImg:"images/yurina/na_01_yurina_o_n_4_s2.png" },
+      { name:"体捌き", effectImg:"images/yurina/na_01_yurina_o_n_5_s9_5.png" },
+      { name:"圧気", effectImg:"images/yurina/na_01_yurina_o_n_6.png" },
+      { name:"気炎万丈", effectImg:"images/yurina/na_01_yurina_o_n_7.png" }
+    ],
+    trumps: [
+      { name:"月影落", effectImg:"images/yurina/na_01_yurina_o_s_1.png" },
+      { name:"浦波嵐", effectImg:"images/yurina/na_01_yurina_o_s_2_s5.png" },
+      { name:"浮舟宿", effectImg:"images/yurina/na_01_yurina_o_s_3_s2.png" },
+      { name:"天音揺波の底力", effectImg:"images/yurina/na_01_yurina_o_s_4.png" }
+    ]
+  },
+  "ヒミカ": {
+    normal: [
+      { name:"シュート", effectImg:"images/himika/na_03_himika_o_n_1.png" },
+      { name:"ラピッドファイア", effectImg:"images/himika/na_03_himika_o_n_2_s4.png" },
+      { name:"マグナムカノン", effectImg:"images/himika/na_03_himika_o_n_3.png" },
+      { name:"フルバースト", effectImg:"images/himika/na_03_himika_o_n_4.png" },
+      { name:"バックステップ", effectImg:"images/himika/na_03_himika_o_n_5.png" },
+      { name:"バックドラフト", effectImg:"images/himika/na_03_himika_o_n_6_s5.png" },
+      { name:"スモーク", effectImg:"images/himika/na_03_himika_o_n_7.png" }
+    ],
+    trumps: [
+      { name:"レッドバレット", effectImg:"images/himika/na_03_himika_o_s_1.png" },
+      { name:"クリムゾンゼロ", effectImg:"images/himika/na_03_himika_o_s_2.png" },
+      { name:"スカーレットイマジン", effectImg:"images/himika/na_03_himika_o_s_3.png" },
+      { name:"ヴァーミリオンフィールド", effectImg:"images/himika/na_03_himika_o_s_4.png" }
+    ]
+  },
+  "サイネ": {
+    normal:[
+      {name:"八方振り",effectImg:"images/saine/na_02_saine_o_n_1_s6_2.png"},
+      {name:"薙斬り",effectImg:"images/saine/na_02_saine_o_n_2.png"},
+      {name:"石突",effectImg:"images/saine/na_02_saine_o_n_3_s6_2.png"},
+      {name:"見切り",effectImg:"images/saine/na_02_saine_o_n_4_s6_2.png"},
+      {name:"圏域",effectImg:"images/saine/na_02_saine_o_n_5_s5.png"},
+      {name:"衝音晶",effectImg:"images/saine/na_02_saine_o_n_6_s3.png"},
+      {name:"無音壁",effectImg:"images/saine/na_02_saine_o_n_7.png"}
+    ],
+    trumps:[
+      {name:"律動弧戟",effectImg:"images/saine/na_02_saine_o_s_1_s2.png"},
+      {name:"響鳴共振",effectImg:"images/saine/na_02_saine_o_s_2_s2.png"},
+      {name:"音無砕氷",effectImg:"images/saine/na_02_saine_o_s_3_s6_2.png"},
+      {name:"氷雨細音の果ての果て",effectImg:"images/saine/na_02_saine_o_s_4_s2.png"}
+    ]
+  },
+  "トコヨ": {
+    normal:[
+      {name:"梳流し",effectImg:"images/tokoyo/na_04_tokoyo_o_n_1_s2.png"},
+      {name:"雅打ち",effectImg:"images/tokoyo/na_04_tokoyo_o_n_2.png"},
+      {name:"跳ね兎",effectImg:"images/tokoyo/na_04_tokoyo_o_n_3.png"},
+      {name:"詩舞",effectImg:"images/tokoyo/na_04_tokoyo_o_n_4.png"},
+      {name:"要返し",effectImg:"images/tokoyo/na_04_tokoyo_o_n_5.png"},
+      {name:"風舞台",effectImg:"images/tokoyo/na_04_tokoyo_o_n_6.png"},
+      {name:"晴舞台",effectImg:"images/tokoyo/na_04_tokoyo_o_n_7_s6_2.png"}
+    ],
+    trumps:[
+      {name:"久遠の花",effectImg:"images/tokoyo/na_04_tokoyo_o_s_1.png"},
+      {name:"千歳ノ鳥",effectImg:"images/tokoyo/na_04_tokoyo_o_s_2.png"},
+      {name:"無窮ノ風",effectImg:"images/tokoyo/na_04_tokoyo_o_s_3_s2.png"},
+      {name:"常世ノ月",effectImg:"images/tokoyo/na_04_tokoyo_o_s_4.png"}
+    ]
+  }
+};
+
+/* ---------- DOM ---------- */
+const modal=document.getElementById("modal");
+const main=document.getElementById("main");
+const list=document.getElementById("char-list");
+const confirm=document.getElementById("confirm");
+const reselect=document.getElementById("reselect");
+const overlay=document.getElementById("overlay");
+const overlayImg=document.getElementById("overlay-img");
+const normalLeft=document.getElementById("normal-left");
+const normalRight=document.getElementById("normal-right");
+const trumpsLeft=document.getElementById("trumps-left");
+const trumpsRight=document.getElementById("trumps-right");
+const leftTitle=document.getElementById("char-left-title");
+const rightTitle=document.getElementById("char-right-title");
+
+/* ---------- 状態 ---------- */
+let selectedChars=[];
+
+/* ---------- キャラ選択 ---------- */
+list.querySelectorAll(".char-item").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const name=btn.dataset.char;
+    const idx=selectedChars.indexOf(name);
+    if(idx!==-1){ selectedChars.splice(idx,1); btn.classList.remove("selected"); }
+    else if(selectedChars.length<2){ selectedChars.push(name); btn.classList.add("selected"); }
+    else{ alert("2キャラまで選択できます"); }
+  });
+});
+
+confirm.addEventListener("click",()=>{
+  if(selectedChars.length!==2){ alert("2キャラ選んでください"); return; }
+  modal.style.display="none"; main.style.display="flex";
+  renderCards();
+});
+reselect.addEventListener("click",()=>{
+  selectedChars=[]; modal.style.display="flex"; main.style.display="none";
+  list.querySelectorAll(".char-item").forEach(b=>b.classList.remove("selected"));
+});
+
+/* ---------- ヘルパ：合計カウント取得 ---------- */
+function getSelectedCounts(){
+  const normalCount = document.querySelectorAll('.card.selected').length;
+  const trumpCount = document.querySelectorAll('.trump-card.selected').length;
+  return { normalCount, trumpCount };
+}
+
+/* ---------- カード要素を作る（合計上限チェック） ---------- */
+function makeCard(card,isTrump=false){
+  const el=document.createElement("div");
+  el.className = isTrump ? "trump-card" : "card";
+  el.textContent = card.name;
+
+  el.addEventListener("click", (e)=>{
+    // 現在の合計選択数を取得
+    const counts = getSelectedCounts();
+
+    if(el.classList.contains("selected")){
+      // 既に選択済み -> 解除（単純）
+      el.classList.remove("selected");
+    } else {
+      // 選択試行 -> 合計制限をチェック
+      if(!isTrump && counts.normalCount >= 7){
+        alert("通常札は合計7枚まで選択できます。");
+        return;
       }
-    };
-
-  const overlay=document.getElementById("overlay");
-  const overlayImg=document.getElementById("overlay-img");
-  const btns=document.querySelectorAll("button[data-char]");
-  const normalLeft=document.getElementById("normal-left");
-  const normalRight=document.getElementById("normal-right");
-  const trumpLeft=document.getElementById("trumps-left");
-  const trumpRight=document.getElementById("trumps-right");
-  const leftTitle=document.getElementById("char-left-title");
-  const rightTitle=document.getElementById("char-right-title");
-
-  let selectedChars=[]; 
-  let selectedNormals=[]; 
-  let selectedTrumps=[];
-
-  btns.forEach(btn=>{
-    btn.addEventListener("click",()=>{
-      const name=btn.dataset.char;
-      const idx=selectedChars.indexOf(name);
-      if(idx!==-1){ selectedChars.splice(idx,1); btn.style.background="#334155";}
-      else{
-        if(selectedChars.length<2){selectedChars.push(name); btn.style.background="#64748b";}
-        else{
-          const removed=selectedChars.shift();
-          document.querySelector(`button[data-char='${removed}']`).style.background="#334155";
-          selectedChars.push(name); btn.style.background="#64748b";
-        }
+      if(isTrump && counts.trumpCount >= 3){
+        alert("切札は合計3枚まで選択できます。");
+        return;
       }
-      render();
-    });
+      el.classList.add("selected");
+    }
   });
 
-  function makeCard(card,isTrump=false){
-    const el=document.createElement("div");
-    el.className=isTrump?"trump-card":"card";
-    el.textContent=card.name;
+  // 長押しで効果画像（Androidの長押しメニュー抑止）
+  let timer = null;
+  el.addEventListener("touchstart", (ev) => {
+    // 長押しメニュー抑止のため preventDefault（passive:false が必要）
+    if (ev.cancelable) ev.preventDefault();
+    timer = setTimeout(()=>{ if(card.effectImg) showImage(card.effectImg); }, 600);
+  }, { passive: false });
+  el.addEventListener("touchend", ()=> clearTimeout(timer));
+  el.addEventListener("touchmove", ()=> clearTimeout(timer));
 
-    // クリック選択
-    el.addEventListener("click",()=>{
-      if(!isTrump){
-        // 通常札
-        if(el.classList.contains("selected")){
-          el.classList.remove("selected");
-          selectedNormals=selectedNormals.filter(x=>x!==el);
-        }else{
-          if(selectedNormals.length<7){
-            el.classList.add("selected");
-            selectedNormals.push(el);
-          }else alert("通常札は7枚まで選択できます。");
-        }
-      }else{
-        // 切札
-        if(el.classList.contains("selected")){
-          el.classList.remove("selected");
-          selectedTrumps=selectedTrumps.filter(x=>x!==el);
-        }else{
-          if(selectedTrumps.length<3){
-            el.classList.add("selected");
-            selectedTrumps.push(el);
-          }else alert("切札は3枚まで選択できます。");
-        }
-      }
-    });
+  // 右クリックでも表示（コンテキストメニュー抑止）
+  el.addEventListener("contextmenu", (ev) => {
+    ev.preventDefault();
+    if(card.effectImg) showImage(card.effectImg);
+  });
 
-    // 長押しで効果画像
-    let timer;
-    el.addEventListener("touchstart",()=>{ timer=setTimeout(()=>{ if(card.effectImg) showImage(card.effectImg); },250); });
-    el.addEventListener("touchend",()=>clearTimeout(timer));
-    el.addEventListener("touchmove",()=>clearTimeout(timer));
+  return el;
+}
 
-    el.addEventListener("contextmenu",(e)=>{ e.preventDefault(); if(card.effectImg) showImage(card.effectImg); });
+/* ---------- 描画 ---------- */
+function renderCards(){
+  const [left,right] = selectedChars;
+  leftTitle.textContent = left;
+  rightTitle.textContent = right;
+  normalLeft.innerHTML = ""; normalRight.innerHTML = ""; trumpsLeft.innerHTML = ""; trumpsRight.innerHTML = "";
 
-    return el;
-  }
+  CHAR_DATA[left].normal.forEach(c => normalLeft.appendChild(makeCard(c,false)));
+  CHAR_DATA[right].normal.forEach(c => normalRight.appendChild(makeCard(c,false)));
+  CHAR_DATA[left].trumps.forEach(t => trumpsLeft.appendChild(makeCard(t,true)));
+  CHAR_DATA[right].trumps.forEach(t => trumpsRight.appendChild(makeCard(t,true)));
+}
 
-  function showImage(src){ overlayImg.src=src; overlay.style.display="flex"; }
-  overlay.addEventListener("click",()=>overlay.style.display="none");
+/* ---------- オーバーレイ ---------- */
+function showImage(src){ overlayImg.src = src; overlay.style.display = "flex"; }
+overlay.addEventListener("click", ()=> overlay.style.display = "none");
 
-  function render(){
-    normalLeft.innerHTML=normalRight.innerHTML=trumpLeft.innerHTML=trumpRight.innerHTML="";
-    const left=selectedChars[0]; const right=selectedChars[1];
-    leftTitle.textContent=left||"メガミA";
-    rightTitle.textContent=right||"メガミB";
-    if(left){ CHAR_DATA[left].normal.forEach(c=>normalLeft.appendChild(makeCard(c,false))); CHAR_DATA[left].trumps.forEach(c=>trumpLeft.appendChild(makeCard(c,true))); }
-    if(right){ CHAR_DATA[right].normal.forEach(c=>normalRight.appendChild(makeCard(c,false))); CHAR_DATA[right].trumps.forEach(c=>trumpRight.appendChild(makeCard(c,true))); }
-  }
-  render();
-    document.addEventListener("contextmenu", e => e.preventDefault());
-  </script>
+/* ---------- ページ全体の右クリック抑止（任意） ---------- */
+document.addEventListener('contextmenu', (e) => { 
+  // 注意: 必要に応じてコメントアウトしてください（カード以外の右クリックも無効化されます）
+  e.preventDefault(); 
+});
+</script>
 </body>
 </html>
