@@ -8,18 +8,17 @@
   html, body {
     margin:0; padding:0;
     width:100%; height:100%;
-    overflow:hidden; /* スクロール禁止 */
+    overflow:hidden;
     background:#0f1724; color:#fff;
     font-family:"Noto Sans JP",sans-serif;
   }
 
   body {
     display:flex; flex-direction:column;
-    justify-content:flex-start; /* 上寄せ */
+    justify-content:flex-start;
     align-items:center;
     height:100vh;
-    box-sizing:border-box;
-    padding-top:2vh; /* 上に少し余裕 */
+    padding-top:2vh;
   }
 
   h2 {
@@ -27,124 +26,76 @@
     margin:2px 0 6px;
   }
 
-  /* キャラ選択部分を拡大 */
   .char-select {
-    display:flex;
-    justify-content:center;
-    flex-wrap:wrap;
-    gap:6px;
-    width:100%;
-    padding:4px 8px;
+    display:flex; justify-content:center; flex-wrap:wrap;
+    gap:6px; width:100%; padding:4px 8px;
   }
-
   .char-select button {
-    flex:1 1 22%;
-    min-width:80px;
-    background:#334155;
-    color:#fff;
-    border:none;
-    border-radius:8px;
-    padding:10px 0;
-    font-size:0.9rem; /* ←大きめフォント */
-    font-weight:600;
-    cursor:pointer;
+    flex:1 1 22%; min-width:80px;
+    background:#334155; color:#fff; border:none;
+    border-radius:8px; padding:10px 0;
+    font-size:0.9rem; font-weight:600; cursor:pointer;
     transition:background 0.2s;
   }
-  .char-select button:hover {
-    background:#475569;
-  }
+  .char-select button:hover { background:#475569; }
 
-  /* メイン表示エリア */
   .main {
-    flex:1;
-    display:flex;
-    justify-content:space-around;
-    align-items:flex-start;
-    width:100%;
-    padding:0 4px;
+    flex:1; display:flex;
+    justify-content:space-around; align-items:flex-start;
+    width:100%; padding:0 4px;
   }
 
   .col {
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-    background:#1e293b;
-    border-radius:10px;
-    margin:4px;
-    padding:4px;
-    height:86%; /* ←上に詰めるため高さ微調整 */
+    flex:1; display:flex; flex-direction:column;
+    align-items:center; justify-content:flex-start;
+    background:#1e293b; border-radius:10px;
+    margin:4px; padding:4px;
+    height:86%;
   }
 
   #char-left-title, #char-right-title {
-    font-size:0.9rem;
-    margin-bottom:2px;
-    font-weight:600;
+    font-size:0.9rem; margin-bottom:2px; font-weight:600;
   }
 
-  /* 通常札の配置 */
   .cards {
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-    gap:4px;
-    width:100%;
-    margin-bottom:3px;
+    display:flex; flex-wrap:wrap; justify-content:center; gap:4px;
+    width:100%; margin-bottom:3px;
   }
 
   .card {
-    width:12vw;
-    height:14vw;
-    background:#fff;
-    color:#000;
-    border-radius:8px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:0.8rem; /* ←カード文字大きめ */
-    text-align:center;
-    cursor:pointer;
-    transition:background .1s;
+    width:12vw; height:14vw;
+    background:#fff; color:#000; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.8rem; text-align:center;
+    cursor:pointer; transition:background .1s;
   }
 
   .card.selected { background:#c7b2ff; }
 
-  /* 切札の配置 */
   .trumps {
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:4px;
-    width:100%;
+    display:grid; grid-template-columns:repeat(2,1fr);
+    gap:4px; width:100%;
   }
 
   .trump-card {
-    background:#ffe9e9;
-    color:#000;
-    font-size:0.75rem;
-    border-radius:6px;
-    padding:4px;
-    cursor:pointer;
-    text-align:center;
+    background:#ffe9e9; color:#000; font-size:0.75rem;
+    border-radius:6px; padding:4px;
+    cursor:pointer; text-align:center;
+    transition:background .1s;
   }
 
-  /* 効果画像オーバーレイ */
+  .trump-card.selected { background:#ffb6b6; }
+
   .overlay {
-    position:fixed;
-    inset:0;
+    position:fixed; inset:0;
     background:rgba(0,0,0,0.85);
-    display:none;
-    align-items:center;
-    justify-content:center;
+    display:none; align-items:center; justify-content:center;
     z-index:9999;
   }
   .overlay img {
-    max-width:85vw;
-    max-height:85vh;
-    border-radius:10px;
+    max-width:85vw; max-height:85vh; border-radius:10px;
   }
 
-  /* iPhone安全領域対応 */
   @supports (padding: env(safe-area-inset-bottom)) {
     body { padding-bottom: env(safe-area-inset-bottom); }
   }
@@ -260,7 +211,9 @@
   const leftTitle=document.getElementById("char-left-title");
   const rightTitle=document.getElementById("char-right-title");
 
-  let selectedChars=[]; let selectedNormals=[];
+  let selectedChars=[]; 
+  let selectedNormals=[]; 
+  let selectedTrumps=[];
 
   btns.forEach(btn=>{
     btn.addEventListener("click",()=>{
@@ -284,8 +237,10 @@
     el.className=isTrump?"trump-card":"card";
     el.textContent=card.name;
 
+    // クリック選択
     el.addEventListener("click",()=>{
       if(!isTrump){
+        // 通常札
         if(el.classList.contains("selected")){
           el.classList.remove("selected");
           selectedNormals=selectedNormals.filter(x=>x!==el);
@@ -296,17 +251,27 @@
           }else alert("通常札は7枚まで選択できます。");
         }
       }else{
-        if(card.effectImg) showImage(card.effectImg);
+        // 切札
+        if(el.classList.contains("selected")){
+          el.classList.remove("selected");
+          selectedTrumps=selectedTrumps.filter(x=>x!==el);
+        }else{
+          if(selectedTrumps.length<3){
+            el.classList.add("selected");
+            selectedTrumps.push(el);
+          }else alert("切札は3枚まで選択できます。");
+        }
       }
     });
 
-    // スマホ長押し対応
+    // 長押しで効果画像
     let timer;
     el.addEventListener("touchstart",()=>{ timer=setTimeout(()=>{ if(card.effectImg) showImage(card.effectImg); },150); });
     el.addEventListener("touchend",()=>clearTimeout(timer));
     el.addEventListener("touchmove",()=>clearTimeout(timer));
 
     el.addEventListener("contextmenu",(e)=>{ e.preventDefault(); if(card.effectImg) showImage(card.effectImg); });
+
     return el;
   }
 
