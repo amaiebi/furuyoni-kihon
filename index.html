@@ -266,7 +266,7 @@
 
     // 長押しで効果画像
     let timer;
-    el.addEventListener("touchstart",()=>{ timer=setTimeout(()=>{ if(card.effectImg) showImage(card.effectImg); },150); });
+    el.addEventListener("touchstart",()=>{ timer=setTimeout(()=>{ if(card.effectImg) showImage(card.effectImg); },200); });
     el.addEventListener("touchend",()=>clearTimeout(timer));
     el.addEventListener("touchmove",()=>clearTimeout(timer));
 
