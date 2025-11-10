@@ -256,6 +256,7 @@ function showImage(src){ overlayImg.src = src; overlay.style.display = "flex"; }
 overlay.addEventListener("click", ()=> overlay.style.display = "none");
 
 /* ---------- ページ全体の右クリック抑止（任意） ---------- */
+  document.addEventListener("contextmenu", e => e.preventDefault());
 </script>
 </body>
 </html>
